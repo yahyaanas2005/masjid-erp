@@ -11,7 +11,7 @@ const User = sequelize.define('User', {
     },
 
     // Basic Information
-    name: {
+    fullName: {
         type: DataTypes.STRING(100),
         allowNull: false,
         validate: {

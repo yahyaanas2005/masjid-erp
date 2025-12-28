@@ -14,10 +14,11 @@ const sequelize = process.env.DATABASE_URL
       connectTimeout: 10000 // 10 seconds timeout
     },
     pool: {
-      max: 1, // High concurrency not needed for single serverless call
+      max: 1,
       min: 0,
-      acquire: 30000,
-      idle: 10000
+      idle: 1000, // Keep connection alive for 1 second of idleness
+      acquire: 5000,
+      evict: 50
     },
     define: {
       timestamps: true,
