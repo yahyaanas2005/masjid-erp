@@ -1,0 +1,8 @@
+{
+    "name": "masjid-erp-monorepo",
+    "private": true,
+    "workspaces": [
+        "backend",
+        "frontend"
+    ]
+}

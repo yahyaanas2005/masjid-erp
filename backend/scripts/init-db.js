@@ -1,31 +1,10 @@
-const { Sequelize } = require('sequelize');
+const { sequelize } = require('../config/database');
+const models = require('../models');
 require('dotenv').config();
 
 // Initialize database connection script
 const initializeDatabase = async () => {
     console.log('🔄 Initializing Masjid ERP Database...\n');
-
-    // Create Sequelize instance
-    const sequelize = process.env.DATABASE_URL
-        ? new Sequelize(process.env.DATABASE_URL, {
-            dialect: 'postgres',
-            dialectOptions: {
-                ssl: {
-                    require: true,
-                    rejectUnauthorized: false
-                }
-            },
-            logging: console.log
-        })
-        : new Sequelize({
-            host: process.env.DB_HOST || 'localhost',
-            port: process.env.DB_PORT || 5432,
-            database: process.env.DB_NAME || 'masjid_erp',
-            username: process.env.DB_USER || 'postgres',
-            password: process.env.DB_PASSWORD,
-            dialect: 'postgres',
-            logging: console.log
-        });
 
     try {
         // Test connection
@@ -33,14 +12,10 @@ const initializeDatabase = async () => {
         await sequelize.authenticate();
         console.log('✅ Database connection established\n');
 
-        // Import models
-        console.log('📦 Loading database models...');
-        const models = require('../models');
-        console.log('✅ Models loaded\n');
-
         // Sync all models (create tables)
         console.log('🔨 Creating database tables...');
-        await sequelize.sync({ force: false, alter: true });
+        // We use syncing to create tables if they don't exist
+        await sequelize.sync({ force: false });
         console.log('✅ All tables created successfully\n');
 
         // Create default admin user
@@ -50,12 +25,11 @@ const initializeDatabase = async () => {
         const [adminUser, created] = await User.findOrCreate({
             where: { email: 'admin@masjid-erp.com' },
             defaults: {
-                fullName: 'System Administrator',
+                name: 'System Administrator',
                 phone: '+1234567890',
                 email: 'admin@masjid-erp.com',
                 password: 'Admin@123', // Will be hashed by the model
                 verificationTier: 4,
-                role: 'admin',
                 isActive: true,
                 emailVerified: true,
                 phoneVerified: true
@@ -82,8 +56,6 @@ const initializeDatabase = async () => {
         console.log('   • Donations');
         console.log('   • MosqueNeeds');
         console.log('   • JanazahNotifications');
-        console.log('   • VerificationHistory');
-        console.log('   • UserMasjidConnections');
         console.log('\n🎉 Your Masjid ERP database is ready to use!\n');
 
         await sequelize.close();

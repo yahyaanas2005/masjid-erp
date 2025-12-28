@@ -1,17 +1,19 @@
-require('dotenv').config();
 const { Sequelize } = require('sequelize');
+const pg = require('pg'); // Explicitly require for Vercel bundling
+require('dotenv').config();
 
-const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
-  {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
+const sequelize = process.env.DATABASE_URL
+  ? new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
-    logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      },
+      family: 4
+    },
     pool: {
-      max: 5,
+      max: 1, // Limited for initialization
       min: 0,
       acquire: 30000,
       idle: 10000
@@ -21,9 +23,32 @@ const sequelize = new Sequelize(
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at'
+    },
+    logging: process.env.NODE_ENV === 'development' ? console.log : false
+  })
+  : new Sequelize(
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASSWORD,
+    {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      dialect: 'postgres',
+      logging: process.env.NODE_ENV === 'development' ? console.log : false,
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+      },
+      define: {
+        timestamps: true,
+        underscored: true,
+        createdAt: 'created_at',
+        updatedAt: 'updated_at'
+      }
     }
-  }
-);
+  );
 
 // Test database connection
 const testConnection = async () => {
