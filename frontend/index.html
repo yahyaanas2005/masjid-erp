@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🕌 Masjid ERP - Islamic Management System</title>
+    <meta name="description" content="Comprehensive Islamic-centered Masjid Management ERP system">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <span class="nav-icon">🕌</span>
+                <span class="nav-title">Masjid ERP</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#masajid" class="nav-link">Masajid</a>
+                <a href="#donate" class="nav-link">Donate</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-outline" id="loginBtn">Login</button>
+                <button class="btn btn-primary" id="registerBtn">Register</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-background"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>
+                    <span class="hero-main">Masjid Management</span>
+                    <span class="hero-sub">Built with Islamic Principles</span>
+                </h1>
+                <p class="hero-description">
+                    A comprehensive ERP system for mosques featuring transparent donation management,
+                    prayer tracking, community engagement, and Janazah notifications.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn btn-large btn-primary" id="getStartedBtn">Get Started</button>
+                    <button class="btn btn-large btn-outline-light" id="learnMoreBtn">Learn More</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="masjidCount">0</div>
+                        <div class="stat-label">Masajid</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="userCount">0</div>
+                        <div class="stat-label">Users</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="donationCount">$0</div>
+                        <div class="stat-label">Donations</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Core Features</h2>
+            <p class="section-subtitle">Everything you need to manage your masjid with transparency and trust</p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>4-Tier Verification</h3>
+                    <p>Progressive trust system with geolocation-based authentication</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📍</div>
+                    <h3>Location-Based</h3>
+                    <p>Google Maps integration for masjid discovery and check-ins</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤲</div>
+                    <h3>Prayer Tracking</h3>
+                    <p>Geo-fenced check-ins with streak tracking and rewards</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>Transparent Donations</h3>
+                    <p>Shariah-compliant with public accountability dashboard</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎁</div>
+                    <h3>Mosque Needs</h3>
+                    <p>Community-driven Sadaqah Jariyah fulfillment system</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚰️</div>
+                    <h3>Janazah Alerts</h3>
+                    <p>Respectful funeral prayer notifications for community</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section (Hidden by default, shown after login) -->
+    <section class="dashboard hidden" id="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h2>Welcome, <span id="userName">User</span></h2>
+                <button class="btn btn-outline" id="logoutBtn">Logout</button>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- Quick Actions -->
+                <div class="dashboard-card">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <button class="action-btn" id="checkInBtn">
+                            <span class="action-icon">🤲</span>
+                            <span>Prayer Check-in</span>
+                        </button>
+                        <button class="action-btn" id="donateBtn">
+                            <span class="action-icon">💰</span>
+                            <span>Make Donation</span>
+                        </button>
+                        <button class="action-btn" id="viewNeedsBtn">
+                            <span class="action-icon">🎁</span>
+                            <span>Mosque Needs</span>
+                        </button>
+                        <button class="action-btn" id="addMasjidBtn">
+                            <span class="action-icon">🕌</span>
+                            <span>Add Masjid</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dashboard-card">
+                    <h3>Recent Activity</h3>
+                    <div id="recentActivity" class="activity-list">
+                        <p class="empty-state">No recent activity</p>
+                    </div>
+                </div>
+
+                <!-- Nearby Masajid -->
+                <div class="dashboard-card full-width">
+                    <h3>Nearby Masajid</h3>
+                    <div id="nearbyMasajid" class="masajid-list">
+                        <p class="empty-state">Loading masajid...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login</h2>
+                <button class="modal-close" data-modal="loginModal">&times;</button>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email or Phone</label>
+                    <input type="text" id="loginEmail" required placeholder="Enter your email or phone">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+            <p class="modal-footer">
+                Don't have an account? <a href="#" id="switchToRegister">Register here</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Register</h2>
+                <button class="modal-close" data-modal="registerModal">&times;</button>
+            </div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" required placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="registerPhone">Phone</label>
+                    <input type="tel" id="registerPhone" required placeholder="+1234567890">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" required placeholder="Create a password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+            </form>
+            <p class="modal-footer">
+                Already have an account? <a href="#" id="switchToLogin">Login here</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>🕌 Masjid ERP</h4>
+                    <p class="arabic">وَمَا تُقَدِّمُوا لِأَنفُسِكُم مِّنْ خَيْرٍ تَجِدُوهُ عِندَ اللَّهِ</p>
+                    <p>"And whatever good you put forward for yourselves - you will find it with Allah"</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="#features">Features</a>
+                    <a href="#masajid">Masajid</a>
+                    <a href="#donate">Donate</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <a href="#">Documentation</a>
+                    <a href="#">API Reference</a>
+                    <a href="#">Contact Us</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Masjid ERP. Built with ❤️ for the Muslim Ummah</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
