@@ -14,6 +14,7 @@ const User = sequelize.define('User', {
     fullName: {
         type: DataTypes.STRING(100),
         allowNull: false,
+        field: 'name', // Map to the existing 'name' column in DB
         validate: {
             notEmpty: true,
             len: [2, 100]
