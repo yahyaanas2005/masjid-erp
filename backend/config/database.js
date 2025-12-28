@@ -10,10 +10,11 @@ const sequelize = process.env.DATABASE_URL
         require: true,
         rejectUnauthorized: false
       },
-      family: 4
+      family: 4,
+      connectTimeout: 10000 // 10 seconds timeout
     },
     pool: {
-      max: 1, // Limited for initialization
+      max: 1, // High concurrency not needed for single serverless call
       min: 0,
       acquire: 30000,
       idle: 10000
@@ -24,7 +25,7 @@ const sequelize = process.env.DATABASE_URL
       createdAt: 'created_at',
       updatedAt: 'updated_at'
     },
-    logging: process.env.NODE_ENV === 'development' ? console.log : false
+    logging: false
   })
   : new Sequelize(
     process.env.DB_NAME,
