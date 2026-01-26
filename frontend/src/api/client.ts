@@ -21,8 +21,17 @@ export const api = async (endpoint: string, options: RequestInit = {}) => {
     });
 
     if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'API Error');
+        let errorMessage = 'API Error';
+        try {
+            const error = await res.json();
+            errorMessage = error.message || errorMessage;
+        } catch (e) {
+            // If JSON parse fails, try text
+            const text = await res.text();
+            console.error('API Non-JSON Error:', text); // Log for debugging
+            errorMessage = `Server Error (${res.status}): ${text.slice(0, 50)}...`;
+        }
+        throw new Error(errorMessage);
     }
 
     return res.json();
