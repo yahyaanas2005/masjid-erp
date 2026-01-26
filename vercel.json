@@ -5,5 +5,11 @@
             "source": "/api/(.*)",
             "destination": "/backend/api/index.ts"
         }
-    ]
+    ],
+    "functions": {
+        "backend/api/index.ts": {
+            "memory": 1024,
+            "maxDuration": 10
+        }
+    }
 }

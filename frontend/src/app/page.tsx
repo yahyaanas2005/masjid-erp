@@ -102,9 +102,17 @@ export default function LoginPage() {
         </form>
       </div>
 
-      <button onClick={handleRegister} className="text-xs text-blue-500 hover:underline">
-        Need an account? Helper: Click to Register
-      </button>
-    </div>
-  );
+      <div className="flex flex-col gap-2 text-center mt-4">
+        <button onClick={handleRegister} className="text-xs text-blue-500 hover:underline">
+          Need an account? Helper: Click to Register
+        </button>
+        <button onClick={async () => {
+          const res = await fetch('/api/health');
+          const text = await res.text();
+          alert("Server Status: " + res.status + "\nResponse: " + text);
+        }} className="text-xs text-gray-400 hover:text-gray-600 underline">
+          Debug: Test Server Connection
+        </button>
+      </div>
+      );
 }
