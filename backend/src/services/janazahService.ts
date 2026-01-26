@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { query } from '../config/db';
 
 export interface CreateJanazahDTO {
     tenant_id: string;
@@ -9,23 +9,25 @@ export interface CreateJanazahDTO {
 }
 
 export const createJanazahAlert = async (data: CreateJanazahDTO) => {
-    const { data: alert, error } = await supabase
-        .from('janazah_alerts')
-        .insert([data])
-        .select()
-        .single();
+    const sql = `
+    INSERT INTO janazah_alerts (tenant_id, deceased_name, prayer_time, location, created_by)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *;
+  `;
+    const values = [
+        data.tenant_id,
+        data.deceased_name,
+        data.prayer_time,
+        data.location,
+        data.created_by
+    ];
 
-    if (error) throw new Error(error.message);
-    return alert;
+    const { rows } = await query(sql, values);
+    return rows[0];
 };
 
 export const getJanazahAlerts = async (tenantId: string) => {
-    const { data, error } = await supabase
-        .from('janazah_alerts')
-        .select('*')
-        .eq('tenant_id', tenantId)
-        .order('created_at', { ascending: false });
-
-    if (error) throw new Error(error.message);
-    return data;
+    const sql = `SELECT * FROM janazah_alerts WHERE tenant_id = $1 ORDER BY created_at DESC`;
+    const { rows } = await query(sql, [tenantId]);
+    return rows;
 };

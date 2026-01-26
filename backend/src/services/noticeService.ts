@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase';
+import { query } from '../config/db';
 
 export interface CreateNoticeDTO {
     tenant_id: string;
@@ -9,23 +9,19 @@ export interface CreateNoticeDTO {
 }
 
 export const createNotice = async (data: CreateNoticeDTO) => {
-    const { data: notice, error } = await supabase
-        .from('announcements')
-        .insert([data])
-        .select()
-        .single();
+    const sql = `
+        INSERT INTO announcements (tenant_id, title, content, priority, created_by)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *;
+    `;
+    const values = [data.tenant_id, data.title, data.content, data.priority, data.created_by];
 
-    if (error) throw new Error(error.message);
-    return notice;
+    const { rows } = await query(sql, values);
+    return rows[0];
 };
 
 export const getNotices = async (tenantId: string) => {
-    const { data, error } = await supabase
-        .from('announcements')
-        .select('*')
-        .eq('tenant_id', tenantId)
-        .order('created_at', { ascending: false });
-
-    if (error) throw new Error(error.message);
-    return data;
+    const sql = `SELECT * FROM announcements WHERE tenant_id = $1 ORDER BY created_at DESC`;
+    const { rows } = await query(sql, [tenantId]);
+    return rows;
 };
