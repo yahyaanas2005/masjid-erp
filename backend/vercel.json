@@ -1,22 +1,14 @@
 {
     "version": 2,
-    "builds": [
+    "rewrites": [
         {
-            "src": "server.js",
-            "use": "@vercel/node"
+            "source": "/api/(.*)",
+            "destination": "/api/index"
         }
     ],
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "server.js"
-        },
-        {
-            "src": "/(.*)",
-            "dest": "server.js"
+    "functions": {
+        "api/index.ts": {
+            "includeFiles": "sql/**"
         }
-    ],
-    "env": {
-        "NODE_ENV": "production"
     }
 }
