@@ -1,7 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import setupMiddleware from './middleware/setup';
-import routes from './routes';
+import authRoutes from './routes/authRoutes';
+import donationRoutes from './routes/donationRoutes';
+import settingsRoutes from './routes/settingsRoutes';
+import prayerRoutes from './routes/prayerRoutes';
+import noticeRoutes from './routes/noticeRoutes';
+import janazahRoutes from './routes/janazahRoutes';
 
 const app = express();
 
@@ -13,7 +18,12 @@ app.use(express.json());
 setupMiddleware(app);
 
 // Routes
-app.use('/api/v1', routes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/donations', donationRoutes);
+app.use('/api/v1/settings', settingsRoutes);
+app.use('/api/v1/prayers', prayerRoutes);
+app.use('/api/v1/notices', noticeRoutes);
+app.use('/api/v1/janazah', janazahRoutes);
 
 // Health Check
 app.get('/health', (req, res) => {
