@@ -1,16 +1,9 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import { Bell, Plus, Trash2, RefreshCw } from "lucide-react";
+import { Bell, Plus, Trash2, RefreshCw, Megaphone, AlertTriangle, Info } from "lucide-react";
 import { api } from "../../../api/client";
 
-interface Notice {
-    id: string;
-    title: string;
-    content: string;
-    priority: string;
-    created_at: string;
-}
+interface Notice { id: string; title: string; content: string; priority: string; created_at: string; }
 
 export default function NoticesPage() {
     const [notices, setNotices] = useState<Notice[]>([]);
@@ -19,116 +12,73 @@ export default function NoticesPage() {
     const [form, setForm] = useState({ title: "", content: "", priority: "NORMAL" });
 
     const fetchNotices = async () => {
-        try {
-            const data = await api('/notices');
-            setNotices(data);
-        } catch (err) {
-            console.error('Failed to load notices:', err);
-        } finally {
-            setLoading(false);
-        }
+        try { const data = await api('/notices'); setNotices(data); }
+        catch (err) { console.error(err); }
+        finally { setLoading(false); }
     };
-
     useEffect(() => { fetchNotices(); }, []);
 
     const handleCreate = async () => {
+        if (!form.title) return;
         try {
-            await api('/notices', {
-                method: 'POST',
-                body: JSON.stringify(form)
-            });
+            await api('/notices', { method: 'POST', body: JSON.stringify(form) });
             setForm({ title: "", content: "", priority: "NORMAL" });
-            setShowForm(false);
-            fetchNotices();
-        } catch (err: any) {
-            alert(err.message || "Failed to create");
-        }
+            setShowForm(false); fetchNotices();
+        } catch (err: any) { alert(err.message); }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Delete this notice?")) return;
-        try {
-            await api(`/notices/${id}`, { method: 'DELETE' });
-            fetchNotices();
-        } catch (err: any) {
-            alert(err.message || "Failed to delete");
-        }
+        if (!confirm("Delete?")) return;
+        await api(`/notices/${id}`, { method: 'DELETE' }); fetchNotices();
     };
 
-    const priorityColors: Record<string, string> = {
-        HIGH: "bg-red-100 text-red-700",
-        NORMAL: "bg-green-100 text-green-700",
-        LOW: "bg-gray-100 text-gray-700"
+    const pConfig: Record<string, { bg: string, text: string }> = {
+        HIGH: { bg: "bg-red-50 border-red-200", text: "text-red-700" },
+        NORMAL: { bg: "bg-blue-50 border-blue-200", text: "text-blue-700" },
+        LOW: { bg: "bg-gray-50 border-gray-200", text: "text-gray-600" }
     };
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Announcements</h2>
-                <button
-                    onClick={() => setShowForm(!showForm)}
-                    className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                >
-                    <Plus className="h-4 w-4" />
-                    Create Notice
-                </button>
+                <div>
+                    <h1 className="text-2xl font-bold flex items-center gap-2"><Megaphone className="w-7 h-7 text-blue-600" />Announcements</h1>
+                    <p className="text-gray-500">Manage mosque announcements</p>
+                </div>
+                <button onClick={() => setShowForm(!showForm)} className="btn-primary"><Plus className="w-4 h-4" />New</button>
             </div>
 
             {showForm && (
-                <div className="rounded-lg border bg-white p-4 dark:bg-gray-950 dark:border-gray-800 space-y-4">
-                    <input
-                        type="text"
-                        placeholder="Title"
-                        value={form.title}
-                        onChange={(e) => setForm({ ...form, title: e.target.value })}
-                        className="w-full rounded-md border p-2"
-                    />
-                    <textarea
-                        placeholder="Content"
-                        value={form.content}
-                        onChange={(e) => setForm({ ...form, content: e.target.value })}
-                        className="w-full rounded-md border p-2"
-                        rows={3}
-                    />
-                    <div className="flex gap-4 items-center">
-                        <select
-                            value={form.priority}
-                            onChange={(e) => setForm({ ...form, priority: e.target.value })}
-                            className="rounded-md border p-2"
-                        >
-                            <option value="HIGH">High Priority</option>
-                            <option value="NORMAL">Normal</option>
-                            <option value="LOW">Low Priority</option>
+                <div className="bg-white rounded-xl border p-6 space-y-4 shadow-lg">
+                    <input type="text" placeholder="Title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="form-input" />
+                    <textarea placeholder="Content" value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} className="form-input min-h-[100px]" />
+                    <div className="flex gap-4">
+                        <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })} className="form-input">
+                            <option value="HIGH">🔴 High</option><option value="NORMAL">🔵 Normal</option><option value="LOW">⚪ Low</option>
                         </select>
-                        <button onClick={handleCreate} className="bg-green-600 text-white px-4 py-2 rounded-md">
-                            Publish
-                        </button>
+                        <button onClick={handleCreate} className="btn-primary">Publish</button>
                     </div>
                 </div>
             )}
 
-            {loading ? (
-                <div className="flex justify-center py-10"><RefreshCw className="h-6 w-6 animate-spin" /></div>
-            ) : (
+            {loading ? <RefreshCw className="w-8 h-8 animate-spin mx-auto" /> : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {notices.map((notice) => (
-                        <div key={notice.id} className="rounded-lg border bg-white p-4 shadow-sm dark:bg-gray-950 dark:border-gray-800">
-                            <div className="flex justify-between items-start mb-2">
-                                <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${priorityColors[notice.priority] || priorityColors.NORMAL}`}>
-                                    {notice.priority}
-                                </span>
-                                <button onClick={() => handleDelete(notice.id)} className="text-gray-400 hover:text-red-600">
-                                    <Trash2 className="h-4 w-4" />
-                                </button>
+                    {notices.map(n => {
+                        const c = pConfig[n.priority] || pConfig.NORMAL;
+                        return (
+                            <div key={n.id} className={`bg-white rounded-xl border shadow-sm overflow-hidden`}>
+                                <div className={`${c.bg} px-4 py-2 flex justify-between border-b`}>
+                                    <span className={`text-xs font-bold ${c.text}`}>{n.priority}</span>
+                                    <button onClick={() => handleDelete(n.id)} className="text-gray-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
+                                </div>
+                                <div className="p-4">
+                                    <h3 className="font-bold text-lg">{n.title}</h3>
+                                    <p className="text-gray-600 text-sm mt-2">{n.content}</p>
+                                    <p className="text-xs text-gray-400 mt-4">{new Date(n.created_at).toLocaleDateString()}</p>
+                                </div>
                             </div>
-                            <h3 className="font-bold text-lg">{notice.title}</h3>
-                            <p className="text-sm text-gray-600 mt-1 dark:text-gray-400">{notice.content}</p>
-                            <div className="mt-4 flex items-center text-xs text-gray-400">
-                                <Bell className="mr-1 h-3 w-3" />
-                                {new Date(notice.created_at).toLocaleDateString()}
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </div>
