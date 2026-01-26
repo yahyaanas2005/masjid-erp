@@ -114,5 +114,6 @@ export default function LoginPage() {
           Debug: Test Server Connection
         </button>
       </div>
-      );
+    </div>
+  );
 }
