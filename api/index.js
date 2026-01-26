@@ -77,7 +77,11 @@ module.exports = async (req, res) => {
             if (existing.rows.length > 0) return err(res, 400, 'User exists');
 
             const hash = await bcrypt.hash(password, 10);
-            const userRole = role || ROLES.NAMAZI; // Default: Namazi
+
+            // FIRST user becomes Chairman automatically!
+            const userCount = await pool.query('SELECT COUNT(*) as count FROM users');
+            const isFirstUser = parseInt(userCount.rows[0].count) === 0;
+            const userRole = isFirstUser ? ROLES.CHAIRMAN : (role || ROLES.NAMAZI);
 
             const userRes = await pool.query(
                 'INSERT INTO users (email, password_hash, role) VALUES ($1, $2, $3) RETURNING id, email, role, created_at',
