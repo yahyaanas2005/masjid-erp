@@ -1,58 +1,46 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-    Clock, Bell, CreditCard, Settings, Users, Calendar,
-    Heart, Megaphone, BookOpen, MapPin, Phone, Globe,
-    BarChart3, TrendingUp, AlertCircle
-} from "lucide-react";
+import { Clock, Bell, CreditCard, Settings, Users, Calendar, Heart, Megaphone, BarChart3, AlertCircle, Crown, Shield } from "lucide-react";
 import { api } from "../../api/client";
 
-interface Stats {
-    donations_month: number;
-    active_notices: number;
-    total_members: number;
-    upcoming_janazah: number;
-}
-
 const modules = [
-    { href: "/dashboard/prayers", label: "Prayer Times", icon: Clock, color: "#0d9488", desc: "Manage daily schedules" },
-    { href: "/dashboard/notices", label: "Announcements", icon: Bell, color: "#3b82f6", desc: "Post & manage notices" },
-    { href: "/dashboard/donations", label: "Donations", icon: CreditCard, color: "#8b5cf6", desc: "Record & track" },
-    { href: "/dashboard/settings", label: "Mosque Profile", icon: Settings, color: "#f59e0b", desc: "Update details" },
-];
-
-const quickActions = [
-    { label: "Add Prayer Time", icon: Clock, href: "/dashboard/prayers", color: "#10b981" },
-    { label: "New Announcement", icon: Megaphone, href: "/dashboard/notices", color: "#3b82f6" },
-    { label: "Record Donation", icon: Heart, href: "/dashboard/donations", color: "#ec4899" },
-    { label: "Janazah Alert", icon: AlertCircle, href: "/dashboard/notices", color: "#f97316" },
-    { label: "View Members", icon: Users, href: "/dashboard/settings", color: "#8b5cf6" },
-    { label: "Monthly Report", icon: BarChart3, href: "/dashboard/donations", color: "#06b6d4" },
+    { href: "/dashboard/prayers", label: "Prayer Times", icon: Clock, color: "#15803d", desc: "Manage schedules" },
+    { href: "/dashboard/notices", label: "Announcements", icon: Bell, color: "#3b82f6", desc: "Post notices" },
+    { href: "/dashboard/donations", label: "Donations", icon: CreditCard, color: "#8b5cf6", desc: "Financial records" },
+    { href: "/dashboard/members", label: "Members", icon: Users, color: "#f59e0b", desc: "Manage users" },
+    { href: "/dashboard/settings", label: "Settings", icon: Settings, color: "#64748b", desc: "Mosque profile" },
 ];
 
 export default function DashboardPage() {
-    const [stats, setStats] = useState<Stats | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [stats, setStats] = useState<any>(null);
+    const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const data = await api('/stats');
-                setStats(data);
-            } catch (err) {
-                console.error('Failed to load stats:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchStats();
+        api('/stats').then(setStats).catch(console.error);
+        api('/auth/me').then(setUser).catch(console.error);
     }, []);
+
+    const hasPermission = (perm: string) => {
+        if (!user?.permissions) return false;
+        return user.permissions.includes('all') || user.permissions.includes(perm);
+    };
 
     return (
         <div className="space-y-8">
-            {/* Stats Row */}
+            {/* Welcome */}
+            <div className="card" style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #065f46 100%)', color: 'white' }}>
+                <div className="flex items-center gap-4">
+                    <div className="text-5xl">🕌</div>
+                    <div>
+                        <p className="text-white/70 text-sm">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</p>
+                        <h1 className="text-2xl font-bold">Welcome, {user?.full_name || 'User'}</h1>
+                        <p className="text-white/80">Role: <strong>{user?.role || 'Loading...'}</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="stat-card">
                     <div className="flex items-center gap-3">
@@ -60,112 +48,98 @@ export default function DashboardPage() {
                             <CreditCard className="w-6 h-6 text-green-600" />
                         </div>
                         <div>
-                            <div className="value">${stats?.donations_month || 0}</div>
-                            <div className="label">Monthly Donations</div>
+                            <div className="stat-value">${stats?.donations_month || 0}</div>
+                            <div className="stat-label">This Month</div>
                         </div>
                     </div>
                 </div>
-
                 <div className="stat-card">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
                             <Bell className="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                            <div className="value">{stats?.active_notices || 0}</div>
-                            <div className="label">Active Notices</div>
+                            <div className="stat-value">{stats?.active_notices || 0}</div>
+                            <div className="stat-label">Notices</div>
                         </div>
                     </div>
                 </div>
-
                 <div className="stat-card">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
                             <Users className="w-6 h-6 text-purple-600" />
                         </div>
                         <div>
-                            <div className="value">{stats?.total_members || 0}</div>
-                            <div className="label">Members</div>
+                            <div className="stat-value">{stats?.total_members || 0}</div>
+                            <div className="stat-label">Members</div>
                         </div>
                     </div>
                 </div>
-
                 <div className="stat-card">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center">
                             <AlertCircle className="w-6 h-6 text-orange-600" />
                         </div>
                         <div>
-                            <div className="value">{stats?.upcoming_janazah || 0}</div>
-                            <div className="label">Janazah Alerts</div>
+                            <div className="stat-value">{stats?.upcoming_janazah || 0}</div>
+                            <div className="stat-label">Janazah</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Main Modules - CloudHQ Style */}
-            <div>
-                <div className="section-header">
-                    <h3>📦 Management Modules</h3>
-                </div>
-                <div className="module-grid">
-                    {modules.map((mod) => (
-                        <Link key={mod.href} href={mod.href} className="module-card">
-                            <div className="icon" style={{ background: `linear-gradient(135deg, ${mod.color} 0%, ${mod.color}dd 100%)` }}>
-                                <mod.icon className="w-7 h-7" />
-                            </div>
-                            <div className="title">{mod.label}</div>
-                            <p className="text-xs text-gray-400 mt-1">{mod.desc}</p>
-                        </Link>
+            {/* Your Permissions */}
+            <div className="section-header">
+                <Shield className="w-5 h-5" />
+                <h3>Your Permissions</h3>
+            </div>
+            <div className="card">
+                <div className="flex flex-wrap gap-2">
+                    {(user?.permissions || []).map((p: string) => (
+                        <span key={p} className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                            ✓ {p.replace(/_/g, ' ')}
+                        </span>
                     ))}
+                    {(!user?.permissions || user.permissions.length === 0) && (
+                        <span className="text-gray-500">Loading permissions...</span>
+                    )}
                 </div>
             </div>
 
-            {/* Quick Actions */}
-            <div>
-                <div className="section-header">
-                    <h3>⚡ Quick Actions</h3>
-                </div>
-                <div className="module-grid">
-                    {quickActions.map((action, i) => (
-                        <Link key={i} href={action.href} className="module-card">
-                            <div className="icon" style={{ background: action.color }}>
-                                <action.icon className="w-6 h-6" />
-                            </div>
-                            <div className="title text-sm">{action.label}</div>
-                        </Link>
-                    ))}
-                </div>
+            {/* Modules */}
+            <div className="section-header">
+                <BarChart3 className="w-5 h-5" />
+                <h3>Management Modules</h3>
+            </div>
+            <div className="module-grid">
+                {modules.map((mod) => (
+                    <Link key={mod.href} href={mod.href} className="module-card">
+                        <div className="icon" style={{ background: mod.color }}>
+                            <mod.icon className="w-7 h-7" />
+                        </div>
+                        <div className="font-semibold mt-2">{mod.label}</div>
+                        <p className="text-xs text-gray-500 mt-1">{mod.desc}</p>
+                    </Link>
+                ))}
             </div>
 
-            {/* Today's Prayer Times Preview */}
-            <div>
-                <div className="section-header">
-                    <h3>🕌 Today's Prayer Times</h3>
+            {/* Prayer Board */}
+            <div className="section-header">
+                <Clock className="w-5 h-5" />
+                <h3>Today's Prayer Times</h3>
+            </div>
+            <div className="prayer-board">
+                <div className="text-center mb-6">
+                    <p className="text-yellow-400 text-xl font-arabic mb-2">بِسْمِ اللَّهِ</p>
+                    <h2 className="text-2xl font-bold text-white">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h2>
                 </div>
-                <div className="prayer-board">
-                    <div className="prayer-board-header">
-                        <h2>بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</h2>
-                        <p className="text-white/60 text-sm mt-1">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                    </div>
-                    <div className="space-y-1">
-                        {[
-                            { name: "Fajr", time: "05:15 AM", iqamah: "05:30 AM" },
-                            { name: "Dhuhr", time: "01:00 PM", iqamah: "01:30 PM" },
-                            { name: "Asr", time: "04:30 PM", iqamah: "05:00 PM" },
-                            { name: "Maghrib", time: "07:45 PM", iqamah: "07:50 PM" },
-                            { name: "Isha", time: "09:30 PM", iqamah: "10:00 PM" },
-                        ].map((prayer) => (
-                            <div key={prayer.name} className="prayer-row">
-                                <div className="prayer-name">{prayer.name}</div>
-                                <div className="prayer-time">{prayer.time}</div>
-                                <div className="prayer-iqamah">{prayer.iqamah}</div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="text-center mt-4 pt-4 border-t border-white/10">
-                        <p className="text-yellow-400 text-sm">🕋 Jumuah: 01:30 PM</p>
-                    </div>
+                <div className="grid grid-cols-5 gap-4">
+                    {[{ n: 'Fajr', t: '05:15' }, { n: 'Dhuhr', t: '13:00' }, { n: 'Asr', t: '16:30' }, { n: 'Maghrib', t: '19:45' }, { n: 'Isha', t: '21:30' }].map(p => (
+                        <div key={p.n} className="text-center p-4 bg-white/10 rounded-xl">
+                            <div className="text-xs text-green-400 uppercase tracking-wider">{p.n}</div>
+                            <div className="text-2xl font-bold text-white mt-1">{p.t}</div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>
